@@ -3,33 +3,31 @@ pipeline {
   stages {
     stage('Say Hello') {
       steps {
-        echo "Hello ${params.Name} from ${NODE_NAME}!"
-        echo "${TEST_USER_USR}"
-        echo "${TEST_USER_PSW}"
+        echo "Hello ${MY_NAME}"
         sh 'java -version'
       }
     }
-    stage('Deploy') {
-      options {
-        timeout(time: 1, unit: 'MINUTES')
-      }
-      input {
-        message 'Which Version?'
-        id 'Deploy'
-        parameters {
-          choice(name: 'APP_VERSION', choices: '''v1.1
-v1.2
-v1.3''', description: 'What to deploy?')
-        }
-      }
+    stage('Get Kernel') {
       steps {
-        echo "Deploying ${APP_VERSION}."
+        script {
+          try {
+            KERNEL_VERSION = sh (script: "uname -r", returnStdout: true)
+          } catch(err) {
+            echo "CAUGHT ERROR: ${err}"
+            throw err
+          }
+        }
+        
+      }
+    }
+    stage('Say Kernel') {
+      steps {
+        echo "${KERNEL_VERSION}"
       }
     }
   }
   environment {
     MY_NAME = 'Bhuvesh'
-    TEST_USER = credentials('test-user')
   }
   post {
     aborted {
@@ -37,8 +35,5 @@ v1.3''', description: 'What to deploy?')
       
     }
     
-  }
-  parameters {
-    string(name: 'Name', defaultValue: 'whoever you are', description: 'Who should I say hi to?')
   }
 }

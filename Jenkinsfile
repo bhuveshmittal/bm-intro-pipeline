@@ -1,3 +1,4 @@
+library 'SharedLibs'
 pipeline {
   agent any
   stages {
@@ -7,6 +8,11 @@ pipeline {
         sh 'java -version'
       }
     }
+    stage('Shared Lib') {
+         steps {
+             helloWorld("Jenkins")
+         }
+      }
   }
   environment {
     MY_NAME = 'Bhuvesh'
